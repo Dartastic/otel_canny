@@ -1,15 +1,16 @@
-// Licensed under the Dartastic Pro Software License Agreement.
+// Licensed under the Apache License, Version 2.0
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
-import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
+import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_canny_suppression.dart';
 
 const _tracerName = 'dartastic_otel_libs_canny';
 
-Tracer _tracer() => OTel.tracerProvider().getTracer(_tracerName);
+APITracer _tracer() => OTelAPI.tracerProvider().getTracer(_tracerName);
 
 class CannyResult {
+  /// Creates a result.
   const CannyResult({
     this.companyId,
     this.entityKind,
@@ -74,8 +75,13 @@ class CannyResult {
   final int? statusCode;
 }
 
+/// What a traced call returned: the value for the caller plus fields
+/// recorded on the span.
 class CannyCallResult<T> {
+  /// Creates a call result.
   const CannyCallResult({required this.value, this.result});
+
+  /// The value returned to the caller.
   final T value;
   final CannyResult? result;
 }
@@ -103,110 +109,110 @@ Future<T> tracedCanny<T>({
   final span = _tracer().startSpan(
     'canny $operation',
     kind: SpanKind.client,
-    attributes: OTel.attributesFromMap(m),
+    attributes: OTelAPI.attributesFromMap(m),
   );
   try {
     final r = await invoke();
     if (r.result != null) {
       final extras = <Attribute<Object>>[];
       if (r.result!.companyId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'canny.company.id',
           r.result!.companyId!,
         ));
       }
       if (r.result!.entityKind != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'canny.entity.kind',
           r.result!.entityKind!,
         ));
       }
       if (r.result!.entityId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'canny.entity.id',
           r.result!.entityId!,
         ));
       }
       if (r.result!.boardId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'canny.board.id',
           r.result!.boardId!,
         ));
       }
       if (r.result!.boardName != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'canny.board.name',
           r.result!.boardName!,
         ));
       }
       if (r.result!.postId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'canny.post.id',
           r.result!.postId!,
         ));
       }
       if (r.result!.postStatus != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'canny.post.status',
           r.result!.postStatus!,
         ));
       }
       if (r.result!.postScore != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'canny.post.score',
           r.result!.postScore!,
         ));
       }
       if (r.result!.commentCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'canny.comment.count',
           r.result!.commentCount!,
         ));
       }
       if (r.result!.voteCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'canny.vote.count',
           r.result!.voteCount!,
         ));
       }
       if (r.result!.changelogEntryId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'canny.changelog_entry.id',
           r.result!.changelogEntryId!,
         ));
       }
       if (r.result!.changelogPublished != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'canny.changelog.published',
           r.result!.changelogPublished!,
         ));
       }
       if (r.result!.changelogTypes != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'canny.changelog.types',
           r.result!.changelogTypes!,
         ));
       }
       if (r.result!.statusChangeFrom != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'canny.status_change.from',
           r.result!.statusChangeFrom!,
         ));
       }
       if (r.result!.statusChangeTo != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'canny.status_change.to',
           r.result!.statusChangeTo!,
         ));
       }
       if (r.result!.tagCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'canny.tag.count',
           r.result!.tagCount!,
         ));
       }
       if (r.result!.statusCode != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'http.response.status_code',
           r.result!.statusCode!,
         ));
@@ -217,13 +223,13 @@ Future<T> tracedCanny<T>({
           );
         }
       }
-      if (extras.isNotEmpty) span.addAttributes(OTel.attributes(extras));
+      if (extras.isNotEmpty) span.addAttributes(OTelAPI.attributes(extras));
     }
     return r.value;
   } catch (e, st) {
-    span.addAttributes(OTel.attributes([
-      OTel.attributeString(
-        ErrorResource.errorType.key,
+    span.addAttributes(OTelAPI.attributes([
+      OTelAPI.attributeString(
+        ErrorAttributes.errorType.key,
         e.runtimeType.toString(),
       ),
     ]));
